@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Text } from 'react-native';
-import { Provider as PaperProvider, Button } from 'react-native-paper';
+import { Provider as PaperProvider, Button, Appbar } from 'react-native-paper';
 
 export default function App() {
   const [input, setInput] = useState('');
@@ -52,6 +52,10 @@ export default function App() {
   };
   return (
     <PaperProvider>
+        <Appbar.Header>
+          <Appbar.BackAction onPress={() => {}} />
+          <Appbar.Content title="Calculadora" />
+        </Appbar.Header>
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Calculadora</Text>
         <View style={styles.display}>
