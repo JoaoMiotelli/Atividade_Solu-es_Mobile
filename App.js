@@ -1,68 +1,120 @@
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { TextInput, Appbar, PaperProvider, Button, Text } from 'react-native-paper';
+import { useState } from 'react';
+import { SafeAreaView, StyleSheet, View, Text } from 'react-native';
+import { Provider as PaperProvider, Button } from 'react-native-paper';
 
-const MyComponent = () => {
-  const [altura, setAltura] = React.useState("");
-  const [peso, setPeso] = React.useState("");
-  const [resultado, setResultado] = React.useState(null);
-
-  const calculoIMC = () => {
-    const alturaMetros = parseFloat(altura) / 100;
-    const imc = parseFloat(peso) / (alturaMetros * alturaMetros);
-    const imcArredondado = imc.toFixed(2);
-    setResultado(imcArredondado);
+export default function App() {
+  const [input, setInput] = useState('');
+  const [operation, setOperation] = useState(null);
+  const [firstNumber, setFirstNumber] = useState(null);
+  const [result, setResult] = useState(null);
+  const handleNumberPress = (num) => {
+    setInput(input + num);
   };
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      margin: 10
-    },
-    marginTop10: {
-      marginTop: 10
-    },
-    marginTop30: {
-      marginTop: 30
-    },
-    resultadoText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      marginTop: 20
+  const handleOperationPress = (op) => {
+    if (input) {
+      setFirstNumber(parseFloat(input));
+      setOperation(op);
+      setInput('');
     }
-  });
-
+  };
+  const handleEqualsPress = () => {
+    if (input && operation && firstNumber !== null) {
+      const secondNumber = parseFloat(input);
+      let tempResult;
+      switch (operation) {
+        case '+':
+          tempResult = firstNumber + secondNumber;
+          break;
+        case '-':
+          tempResult = firstNumber - secondNumber;
+          break;
+        case '*':
+          tempResult = firstNumber * secondNumber;
+          break;
+        case '/':
+          tempResult = secondNumber !== 0 ? firstNumber / secondNumber : 'Erro: Divisão por zero';
+          break;
+        default:
+          tempResult = 'Operação inválida';
+        }
+      setResult(tempResult);
+      setInput('');
+      setFirstNumber(null);
+      setOperation(null);
+    }
+  };
+  const handleClear = () => {
+    setInput('');
+    setFirstNumber(null);
+    setOperation(null);
+    setResult(null);
+  };
   return (
     <PaperProvider>
-      <View style={styles.container}>
-        <Appbar.Header>
-          <Appbar.BackAction onPress={() => {}} />
-          <Appbar.Content title="Calculadora de IMC" />
-        </Appbar.Header>
-        <TextInput
-          label="Altura (cm)"
-          value={altura}
-          onChangeText={text => setAltura(text)}
-          keyboardType="numeric"
-        />
-        <TextInput style={styles.marginTop10}
-          label="Peso (kg)"
-          value={peso}
-          onChangeText={text => setPeso(text)}
-          keyboardType="numeric"
-        />
-        <Button style={styles.marginTop30} icon="" mode="contained" onPress={calculoIMC}>
-          Calcular IMC
-        </Button>
-        {resultado && (
-          <Text style={styles.resultadoText}>
-            Seu IMC é: {resultado}
-          </Text>
-        )}
-      </View>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Calculadora</Text>
+        <View style={styles.display}>
+          <Text style={styles.displayText}>{input || (result !== null ? result : '0')}</Text>
+        </View>
+          <View style={styles.buttonContainer}>
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].map((num) => (
+              <Button
+                mode="contained"
+                onPress={() => handleNumberPress(num)}
+                style={styles.button}
+                key={num}
+              >
+              {num}
+              </Button>
+              ))}
+        </View>
+          <View style={styles.buttonContainer}>
+            <Button mode="contained" onPress={() => handleOperationPress('+')} style={styles.button}>+</Button>
+            <Button mode="contained" onPress={() => handleOperationPress('-')} style={styles.button}>-</Button>
+            <Button mode="contained" onPress={() => handleOperationPress('*')} style={styles.button}>*</Button>
+            <Button mode="contained" onPress={() => handleOperationPress('/')} style={styles.button}>/</Button>
+          </View>
+            <View style={styles.buttonContainer}>
+              <Button mode="contained" onPress={handleEqualsPress} style={styles.button}>=</Button>
+              <Button mode="contained" onPress={handleClear} style={styles.button}>C</Button>
+          </View>
+      </SafeAreaView>
     </PaperProvider>
   );
-};
-
-export default MyComponent;
+}
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: 16,
+      backgroundColor: '#f5f5f5',
+    },
+    title: {
+      fontSize: 24,
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    display: {
+      marginBottom: 20,
+      padding: 10,
+      backgroundColor: '#ffffff',
+      borderRadius: 5,
+      elevation: 2,
+    },
+    displayText: {
+      fontSize: 36,
+      textAlign: 'right',
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      marginBottom: 10,
+    },
+    button: {
+      margin: 5,
+      flexBasis: '22%',
+    },
+  }
+);
